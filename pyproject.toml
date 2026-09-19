@@ -1,0 +1,21 @@
+[project]
+name = "dc-escooter-injuries"
+version = "0.1.0"
+description = "How many people are hurt on shared e-scooters in DC, over time -- built from DC MPD's public crash data"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "Tom Lee", email = "thomas.j.lee@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.11.2",
+]
+
+[project.scripts]
+fetch-crash-data = "dc_escooter_injuries:fetch_crash_data_main"
+build-analysis = "dc_escooter_injuries:build_main"
+
+[build-system]
+requires = ["uv_build>=0.12.3,<0.13.0"]
+build-backend = "uv_build"

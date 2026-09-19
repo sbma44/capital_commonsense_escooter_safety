@@ -1,0 +1,37 @@
+ward,severity,count
+Null,Minor,3
+Null,None,2
+Unknown/unmatched,Major,6
+Unknown/unmatched,Minor,17
+Unknown/unmatched,None,37
+Ward 1,Fatal,1
+Ward 1,Major,25
+Ward 1,Minor,211
+Ward 1,None,241
+Ward 2,Fatal,1
+Ward 2,Major,48
+Ward 2,Minor,310
+Ward 2,None,241
+Ward 3,Major,8
+Ward 3,Minor,75
+Ward 3,None,46
+Ward 4,Fatal,2
+Ward 4,Major,26
+Ward 4,Minor,126
+Ward 4,None,127
+Ward 5,Fatal,2
+Ward 5,Major,46
+Ward 5,Minor,181
+Ward 5,None,180
+Ward 6,Fatal,2
+Ward 6,Major,19
+Ward 6,Minor,216
+Ward 6,None,182
+Ward 7,Fatal,2
+Ward 7,Major,37
+Ward 7,Minor,133
+Ward 7,None,128
+Ward 8,Fatal,4
+Ward 8,Major,28
+Ward 8,Minor,83
+Ward 8,None,131
