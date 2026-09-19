@@ -81,6 +81,20 @@ data/
     raw/                    # gitignored; populated by fetch_crash_data.py
     reference/              # small checked-in datasets, see SOURCES.md
 output/                     # generated: CSVs, chart, DATA_NOTES.md
+tests/                       # see Testing below
+```
+
+## Testing
+
+```bash
+uv run pytest              # fast, no network: transform/aggregation logic + the
+                            # checked-in reference CSVs. Runs in well under a second.
+uv run pytest -m live       # hits DDOT's real ArcGIS endpoints, read-only, a
+                            # handful of rows total -- confirms the two live
+                            # endpoints this project depends on are still up
+                            # and shaped the way the code expects. Excluded
+                            # from the default run so nobody hits them by
+                            # accident on every `pytest` invocation.
 ```
 
 ## License

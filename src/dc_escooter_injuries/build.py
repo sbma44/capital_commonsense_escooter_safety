@@ -117,14 +117,13 @@ def age_band_of(age: str) -> str:
     return "Unknown"
 
 
-def load_scooter_rows() -> list[dict]:
-    if not SOURCE_CSV.exists():
+def load_scooter_rows(source_csv: Path = SOURCE_CSV) -> list[dict]:
+    if not source_csv.exists():
         raise SystemExit(
-            f"{SOURCE_CSV.relative_to(REPO_ROOT)} not found. "
-            f"Run `uv run fetch-crash-data` first."
+            f"{source_csv} not found. Run `uv run fetch-crash-data` first."
         )
     rows = []
-    with SOURCE_CSV.open(encoding="utf-8-sig", newline="") as f:
+    with source_csv.open(encoding="utf-8-sig", newline="") as f:
         reader = csv.DictReader(f)
         for row in reader:
             src = match_source(row["INVEHICLETYPE"])
@@ -235,54 +234,78 @@ def write_person_level(rows: list[dict]) -> None:
     write_csv(OUTPUT_DIR / "person_level.csv", fieldnames, rows)
 
 
-def write_timeseries_month(rows: list[dict]) -> None:
+def aggregate_timeseries_month(rows: list[dict]) -> list[dict]:
     counts = Counter(
         (r["year_month"], r["severity"]) for r in rows if r["year_month"]
     )
-    out = [
+    return [
         {"year_month": ym, "severity": sev, "count": n}
         for (ym, sev), n in sorted(counts.items())
     ]
-    write_csv(OUTPUT_DIR / "timeseries_month_severity.csv", ["year_month", "severity", "count"], out)
 
 
-def write_timeseries_quarter(rows: list[dict]) -> None:
+def write_timeseries_month(rows: list[dict]) -> None:
+    write_csv(
+        OUTPUT_DIR / "timeseries_month_severity.csv",
+        ["year_month", "severity", "count"],
+        aggregate_timeseries_month(rows),
+    )
+
+
+def aggregate_timeseries_quarter(rows: list[dict]) -> list[dict]:
     counts = Counter(
         (quarter_of(r["year_month"]), r["severity"]) for r in rows if r["year_month"]
     )
-    out = [
+    return [
         {"year_quarter": yq, "severity": sev, "count": n}
         for (yq, sev), n in sorted(counts.items())
     ]
+
+
+def write_timeseries_quarter(rows: list[dict]) -> None:
     write_csv(
         OUTPUT_DIR / "timeseries_quarter_severity.csv",
         ["year_quarter", "severity", "count"],
-        out,
+        aggregate_timeseries_quarter(rows),
     )
 
 
-def write_timeseries_year(rows: list[dict]) -> None:
+def aggregate_timeseries_year(rows: list[dict]) -> list[dict]:
     counts = Counter((r["year"], r["severity"]) for r in rows)
-    out = [
+    return [
         {"year": yr, "severity": sev, "count": n}
         for (yr, sev), n in sorted(counts.items())
     ]
-    write_csv(OUTPUT_DIR / "timeseries_year_severity.csv", ["year", "severity", "count"], out)
 
 
-def write_breakdown_age(rows: list[dict]) -> None:
+def write_timeseries_year(rows: list[dict]) -> None:
+    write_csv(
+        OUTPUT_DIR / "timeseries_year_severity.csv",
+        ["year", "severity", "count"],
+        aggregate_timeseries_year(rows),
+    )
+
+
+def aggregate_breakdown_age(rows: list[dict]) -> list[dict]:
     counts = Counter((r["age_band"], r["severity"]) for r in rows)
     band_order = [b[2] for b in AGE_BANDS] + ["Unknown"]
-    out = [
+    return [
         {"age_band": band, "severity": sev, "count": counts[(band, sev)]}
         for band in band_order
         for sev in ["Fatal", "Major", "Minor", "None"]
         if counts[(band, sev)]
     ]
-    write_csv(OUTPUT_DIR / "breakdown_age_band.csv", ["age_band", "severity", "count"], out)
 
 
-def write_breakdown_flags(rows: list[dict]) -> None:
+def write_breakdown_age(rows: list[dict]) -> None:
+    write_csv(
+        OUTPUT_DIR / "breakdown_age_band.csv",
+        ["age_band", "severity", "count"],
+        aggregate_breakdown_age(rows),
+    )
+
+
+def aggregate_breakdown_flags(rows: list[dict]) -> list[dict]:
     out = []
     for flag_type, key in [
         ("impaired", "IMPAIRED"),
@@ -299,29 +322,47 @@ def write_breakdown_flags(rows: list[dict]) -> None:
                     "count": n,
                 }
             )
+    return out
+
+
+def write_breakdown_flags(rows: list[dict]) -> None:
     write_csv(
         OUTPUT_DIR / "breakdown_impaired_speeding_ticket.csv",
         ["flag_type", "flag_value", "severity", "count"],
-        out,
+        aggregate_breakdown_flags(rows),
     )
 
 
-def write_breakdown_ward(rows: list[dict]) -> None:
+def aggregate_breakdown_ward(rows: list[dict]) -> list[dict]:
     counts = Counter((r["ward"] or "Unknown/unmatched", r["severity"]) for r in rows)
-    out = [
+    return [
         {"ward": ward, "severity": sev, "count": n}
         for (ward, sev), n in sorted(counts.items())
     ]
-    write_csv(OUTPUT_DIR / "breakdown_ward.csv", ["ward", "severity", "count"], out)
 
 
-def write_breakdown_match_source(rows: list[dict]) -> None:
+def write_breakdown_ward(rows: list[dict]) -> None:
+    write_csv(
+        OUTPUT_DIR / "breakdown_ward.csv",
+        ["ward", "severity", "count"],
+        aggregate_breakdown_ward(rows),
+    )
+
+
+def aggregate_breakdown_match_source(rows: list[dict]) -> list[dict]:
     counts = Counter((r["match_source"], r["year"]) for r in rows)
-    out = [
+    return [
         {"match_source": src, "year": yr, "count": n}
         for (src, yr), n in sorted(counts.items())
     ]
-    write_csv(OUTPUT_DIR / "breakdown_match_source.csv", ["match_source", "year", "count"], out)
+
+
+def write_breakdown_match_source(rows: list[dict]) -> None:
+    write_csv(
+        OUTPUT_DIR / "breakdown_match_source.csv",
+        ["match_source", "year", "count"],
+        aggregate_breakdown_match_source(rows),
+    )
 
 
 def load_ridership_by_quarter() -> dict[str, tuple[int, int]]:
