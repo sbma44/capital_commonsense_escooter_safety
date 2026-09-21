@@ -8,8 +8,8 @@ so the methodology can be checked rather than taken on faith.
 
 ![Quarterly scooter-rider crash involvements by severity](output/quarterly_injuries_by_severity.png)
 
-This chart (and the data behind it) supports a post on the *Capital
-Commonsense* Substack <!-- TODO: link the published post here -->. This repo
+This chart (and the data behind it) supports a post on the *[Capital
+Commonsense](https://capitalcommonsense.substack.com/p/capital-commonsense)* Substack. This repo
 is the "show your work" -- everything here is meant to be reproducible by a
 third party from public data.
 
@@ -19,7 +19,7 @@ Requires [uv](https://docs.astral.sh/uv/).
 
 ```bash
 git clone <this-repo-url>
-cd dc-escooter-injuries
+cd capital_commonsense_escooter_safety
 uv sync
 
 uv run fetch-crash-data   # ~1-5 min: pulls DC's live crash-detail table (~900k rows) into data/raw/
